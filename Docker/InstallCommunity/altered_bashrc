@@ -1,0 +1,9 @@
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+export PATH=$PATH:/Tools/DotNet/bin/dotnet/bin
+export DOTNET_HOME=/Tools/DotNet/bin/dshrc
+
+

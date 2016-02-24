@@ -10,6 +10,9 @@ RUN echo 'Hey, Im a text file' | tee /Tools/DotNet/someFile.txt
 RUN mkdir -p /Tools/DotNet/bin/dotnet
 RUN gunzip dotnet-centos-x64.latest.tar.gz 
 RUN tar -xf dotnet-centos-x64.latest.tar -C /Tools/DotNet/bin/dotnet
+RUN rm /dotnet-centos-x64.latest.tar
 RUN adduser rick
 RUN echo a_password | passwd rick --stdin
 RUN su - rick
+RUN rm /home/rick/.bashrc
+ADD altered_bashrc /home/rick/.bashrc
