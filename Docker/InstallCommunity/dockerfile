@@ -1,21 +1,15 @@
 FROM docker.io/rhel
-# Add yum repos
-RUN rpm -Uvh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
-RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-# install pre-reqs for DotNet
-RUN curl http://fr2.rpmfind.net/linux/centos/7/os/x86_64/Packages/unzip-6.0-15.el7.x86_64.rpm > unzip-6.0-15.el7.x86_64.rpm
-RUN yum install -y unzip-6.0-15.el7.x86_64.rpm
-RUN yum install p7zip -y
-RUN rm unzip-6.0-15.el7.x86_64.rpm
-RUN yum install –y libicu libuuid libcurl openssl libunwind
-RUN yum install curl
+RUN subscription-manager register --username SOME_NAME --password 'SOME_PASSWORD' --auto-attach
+RUN yum install tar -y
+RUN yum install libicu libuuid libcurl openssl libunwind -y
+RUN yum install curl -y
 RUN mkdir -p /Tools/DotNet
 RUN cd /Tools/DotNet
 RUN curl https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-centos-x64.latest.tar.gz > dotnet-centos-x64.latest.tar.gz
 RUN echo 'Hey, Im a text file' | tee /Tools/DotNet/someFile.txt
 RUN mkdir -p /Tools/DotNet/bin/dotnet
 RUN gunzip dotnet-centos-x64.latest.tar.gz 
-RUN 7za x dotnet-centos-x64.latest.tar -o/Tools/DotNet/bin/dotnet
+RUN tar -xf dotnet-centos-x64.latest.tar -C /Tools/DotNet/bin/dotnet
 RUN adduser rick
-RUN echo someSecret | passwd rick --stdin
+RUN echo a_password | passwd rick --stdin
 RUN su - rick
