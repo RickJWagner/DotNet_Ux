@@ -1,0 +1,12 @@
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+export DOTNET_HOME=/Tools/DotNet
+export PATH=${PATH}:/opt/microsoft/dotnet5-5.0.0/bin
+export LOCALAPPDATA=/home/rick/.aspnet
+
+unset LANG
+
+

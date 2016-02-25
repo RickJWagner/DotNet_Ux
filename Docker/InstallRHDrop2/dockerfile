@@ -1,0 +1,44 @@
+FROM docker.io/rhel
+RUN subscription-manager register --username A_NAME --password 'A_PASSWORD' --auto-attach
+RUN ln -s /usr/lib64/libcurl.so.4 /usr/lib64/libcurl.so
+RUN ln -s /usr/lib64/libcrypto.so.10 /usr/lib64/libcrypto.so
+RUN ln -s /usr/lib64/libuv.so.1.0.0 /usr/lib64/libuv.so
+RUN yum -y install libicu
+RUN yum -y install tar
+RUN yum -y install scl-utils
+
+RUN mkdir -p /Tools/DotNet
+COPY  rh-dotnet-core10-1-1.el7.src.rpm /Tools/DotNet/rh-dotnet-core10-1-1.el7.src.rpm
+COPY rh-dotnet-core10-1-1.el7.x86_64.rpm /Tools/DotNet/rh-dotnet-core10-1-1.el7.x86_64.rpm
+# COPY rh-dotnet-core10-build-1-1.el7.x86_64.rpm /Tools/DotNet/rh-dotnet-core10-build-1-1.el7.x86_64.rpm
+COPY rh-dotnet-core10-dotnet-core-1.0.0-0.1.20160217.el7.src.rpm /Tools/DotNet/rh-dotnet-core10-dotnet-core-1.0.0-0.1.20160217.el7.src.rpm
+COPY rh-dotnet-core10-dotnet-core-1.0.0-0.1.20160217.el7.x86_64.rpm /Tools/DotNet/rh-dotnet-core10-dotnet-core-1.0.0-0.1.20160217.el7.x86_64.rpm
+COPY rh-dotnet-core10-runtime-1-1.el7.x86_64.rpm /Tools/DotNet/rh-dotnet-core10-runtime-1-1.el7.x86_64.rpm
+COPY libunwind-1.1-5.el7.x86_64.rpm /Tools/DotNet/libunwind-1.1-5.el7.x86_64.rpm
+COPY libuv-1.0.0-1.el7.x86_64.rpm /Tools/DotNet/libuv-1.0.0-1.el7.x86_64.rpm
+COPY demo.tar.gz /Tools/DotNet/demo.tar.gz
+
+RUN rpm -ivh /Tools/DotNet/libunwind-1.1-5.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/libuv-1.0.0-1.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/rh-dotnet-core10-runtime-1-1.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/rh-dotnet-core10-1-1.el7.src.rpm
+RUN rpm -ivh /Tools/DotNet/rh-dotnet-core10-1-1.el7.x86_64.rpm
+# RUN rpm -ivh /Tools/DotNet/rh-dotnet-core10-build-1-1.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/rh-dotnet-core10-dotnet-core-1.0.0-0.1.20160217.el7.src.rpm
+# RUN rpm -ivh /Tools/DotNet/rh-dotnet-core10-dotnet-core-1.0.0-0.1.20160217.el7.x86_64.rpm
+RUN gunzip /Tools/DotNet/demo.tar.gz
+RUN mkdir /Tools/DotNet/demo
+RUN mkdir /Tools/DotNet/demo/samples
+RUN tar -xf /Tools/DotNet/demo.tar -C /Tools/DotNet/demo/samples
+
+
+RUN adduser rick
+RUN echo password | passwd rick --stdin
+RUN su - rick
+RUN rm /home/rick/.bashrc
+ADD altered_bashrc /home/rick/.bashrc
+RUN mkdir /home/rick/.aspnet
+RUN mkdir -p /home/rick/.config/NuGet
+RUN echo '<?xml version="1.0" encoding="utf-8"?><configuration><packageSources><clear/><add key="local package source" value="/opt/microsoft/dotnet-5.0.0/nugetcache" /></packageSources></configuration>' | tee /home/rick/.config/NuGet/NuGet.Config
+RUN unset LANG
+EXPOSE 5004
