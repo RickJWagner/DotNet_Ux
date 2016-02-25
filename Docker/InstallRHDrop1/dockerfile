@@ -1,0 +1,28 @@
+FROM docker.io/rhel
+RUN subscription-manager register --username A_USER --password A_PASSWORD --auto-attach
+RUN ln -s /usr/lib64/libcurl.so.4 /usr/lib64/libcurl.so
+RUN ln -s /usr/lib64/libcrypto.so.10 /usr/lib64/libcrypto.so
+RUN ln -s /usr/lib64/libuv.so.1.0.0 /usr/lib64/libuv.so
+RUN yum -y install libicu
+RUN yum -y install tar
+
+RUN mkdir -p /Tools/DotNet
+COPY dotnet5-rc1-v01.tar.gz /Tools/DotNet/dotnet5-rc1-v01.tar.gz
+RUN gunzip /Tools/DotNet/dotnet5-rc1-v01.tar.gz
+RUN tar -xf /Tools/DotNet/dotnet5-rc1-v01.tar -C /Tools/DotNet
+RUN ls -l /Tools/DotNet
+RUN rpm -ivh /Tools/DotNet/runtime_requirements/libuv-1.0.0-1.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/runtime_requirements/libunwind-1.1-5.el7.x86_64.rpm # http://download.devel.redhat.com/brewroot/packages/libunwind/1.1/5.el7/x86_64/libunwind-1.1-5.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/dotnet/dotnet5-5.0.0-0.1.rc1.el7.x86_64.rpm
+RUN rpm -ivh /Tools/DotNet/modules/dotnet5-*
+
+RUN adduser rick
+RUN echo password | passwd rick --stdin
+RUN su - rick
+RUN rm /home/rick/.bashrc
+ADD altered_bashrc /home/rick/.bashrc
+RUN mkdir /home/rick/.aspnet
+RUN mkdir -p /home/rick/.config/NuGet
+RUN echo '<?xml version="1.0" encoding="utf-8"?><configuration><packageSources><clear/><add key="local package source" value="/opt/microsoft/dotnet-5.0.0/nugetcache" /></packageSources></configuration>' | tee /home/rick/.config/NuGet/NuGet.Config
+RUN unset LANG
+
